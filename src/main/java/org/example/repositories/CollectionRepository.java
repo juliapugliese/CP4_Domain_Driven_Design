@@ -31,6 +31,8 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
         }
     }
 
+    //CRIAR MÉTODO ADICIONAR CARTA A COLEÇÃO
+
     @Override
     public List<Collection> getAll() {
         try (var conn = new OracleDbConfiguration().getConnection()) {
