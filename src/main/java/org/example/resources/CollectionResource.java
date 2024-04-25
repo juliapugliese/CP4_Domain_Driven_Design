@@ -9,8 +9,6 @@ import org.example.services.CollectionService;
 
 
 public class CollectionResource {
-
-
     public CollectionRepository collectionRepository;
     public CollectionService collectionService;
 
@@ -18,7 +16,6 @@ public class CollectionResource {
         collectionRepository = new CollectionRepository();
         collectionService = new CollectionService();
     }
-
 
     @GET
     @Path("{id}")

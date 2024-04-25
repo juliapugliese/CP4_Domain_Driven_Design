@@ -75,6 +75,48 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
         }
     }
 
+    public List<Collection> getAllFiltro(String orderBy, String direction, int limit, int offset) {
+        var colecoes = new ArrayList<Collection>();
+        try(var conn = new OracleDbConfiguration().getConnection()){
+            var stmt = conn.prepareStatement(
+                    "SELECT * FROM "+ TB_NAME + " ORDER BY " + orderBy + " " +
+                            (direction == null || direction.isEmpty() ? "ASC" : direction)
+                            + " OFFSET "+offset+" ROWS FETCH NEXT "+ (limit == 0 ? 10 : limit) +" ROWS ONLY");{
+            var rs = stmt.executeQuery();
+            while (rs.next()){
+                int codColecao = rs.getInt("COD_COLECAO");
+
+                var listaCartas = new ArrayList<Card>();
+                try (var stmtCartas = conn.prepareStatement("SELECT * FROM " + CardRepository.TB_NAME + " WHERE COD_COLECAO = ? ORDER BY COD_CARTAS")) {
+                    stmtCartas.setInt(1, codColecao);
+                    var rsCartas = stmtCartas.executeQuery();
+                    while (rsCartas.next()) {
+                        listaCartas.add(new Card(
+                                rsCartas.getInt("COD_CARTAS"),
+                                rsCartas.getString("NOME"),
+                                rsCartas.getString("TIPO"),
+                                rsCartas.getString("DESCRICAO"),
+                                rsCartas.getInt("PODER"),
+                                rsCartas.getInt("RESISTENCIA"),
+                                rsCartas.getDouble("PRECO")
+                        ));
+                    }
+                }
+                colecoes.add(new Collection(
+                        codColecao,
+                        rs.getString("NOME"),
+                        rs.getDate("DATA_LANCAMENTO").toLocalDate(),
+                        listaCartas
+                ));
+                }
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return colecoes;
+    }
+
     @Override
     public Optional<Collection> get(int id){
         try(var conn = new OracleDbConfiguration().getConnection()) {

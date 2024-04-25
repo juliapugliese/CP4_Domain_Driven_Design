@@ -80,6 +80,48 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
         return cartas;
     }
 
+    public List<Card> getAllFiltro(String orderBy, String direction, int limit, int offset) {
+        var cartas = new ArrayList<Card>();
+        try(var conn = new OracleDbConfiguration().getConnection();
+            var stmt = conn.prepareStatement(
+                    "SELECT * FROM "+ TB_NAME + " ORDER BY " + orderBy + " " +
+                            (direction == null || direction.isEmpty() ? "ASC" : direction)
+                            + " OFFSET "+offset+" ROWS FETCH NEXT "+ (limit == 0 ? 10 : limit) +" ROWS ONLY");){
+            var rs = stmt.executeQuery();
+            while (rs.next()){
+                CollectionRepository collectionRepository = new CollectionRepository();
+                int codColecao = rs.getInt("COD_COLECAO");
+                if (rs.wasNull()) {
+                    cartas.add(new Card(
+                            rs.getInt("COD_CARTAS"),
+                            rs.getString("NOME"),
+                            rs.getString("TIPO"),
+                            rs.getString("DESCRICAO"),
+                            rs.getInt("PODER"),
+                            rs.getInt("RESISTENCIA"),
+                            rs.getDouble("PRECO"),
+                            null
+                    ));
+                } else {
+                    cartas.add(new Card(
+                            rs.getInt("COD_CARTAS"),
+                            rs.getString("NOME"),
+                            rs.getString("TIPO"),
+                            rs.getString("DESCRICAO"),
+                            rs.getInt("PODER"),
+                            rs.getInt("RESISTENCIA"),
+                            rs.getDouble("PRECO"),
+                            collectionRepository.get(codColecao).get()
+                    ));
+                }
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return cartas;
+    }
+
     public List<Card> getAllByCollection(int idCollection){
         var cartas = new ArrayList<Card>();
         try{var conn = new OracleDbConfiguration().getConnection();
