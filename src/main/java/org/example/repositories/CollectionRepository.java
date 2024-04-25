@@ -76,45 +76,6 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
     }
 
     @Override
-//    public Optional<Collection> get(int id){
-//        try(var conn = new OracleDbConfiguration().getConnection()) {
-//            var stmt = conn.prepareStatement("SELECT * FROM " + TB_NAME + " ORDER BY COD_COLECAO");
-//            var rs = stmt.executeQuery();
-//            while (rs.next()) {
-//                int codColecao = rs.getInt("COD_COLECAO");
-//
-//                var listaCartas = new ArrayList<Card>();
-//                try (var stmtCartas = conn.prepareStatement("SELECT * FROM " + CardRepository.TB_NAME + " WHERE COD_COLECAO = ? ORDER BY COD_CARTAS")) {
-//                    stmtCartas.setInt(1, codColecao);
-//                    var rsCartas = stmtCartas.executeQuery();
-//                    while (rsCartas.next()) {
-//                        listaCartas.add(new Card(
-//                                rsCartas.getInt("COD_CARTAS"),
-//                                rsCartas.getString("NOME"),
-//                                rsCartas.getString("TIPO"),
-//                                rsCartas.getString("DESCRICAO"),
-//                                rsCartas.getInt("PODER"),
-//                                rsCartas.getInt("RESISTENCIA"),
-//                                rsCartas.getDouble("PRECO")
-//                        ));
-//                    }
-//                }
-//                var colecao = new Collection(
-//                        codColecao,
-//                        rs.getString("NOME"),
-//                        rs.getDate("DATA_LANCAMENTO").toLocalDate(),
-//                        listaCartas
-//                );
-//                logInfo("Lendo colecao: " + colecao);
-//                return Optional.of(colecao);
-//            }
-//            conn.close();
-//        }
-//        catch (SQLException e) {
-//            logError(e);
-//        }
-//        return Optional.empty();
-//    }
     public Optional<Collection> get(int id){
         try(var conn = new OracleDbConfiguration().getConnection()) {
             var stmt = conn.prepareStatement("SELECT * FROM " + TB_NAME + " WHERE COD_COLECAO = ?");
@@ -144,7 +105,7 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
                         rs.getDate("DATA_LANCAMENTO").toLocalDate(),
                         listaCartas
                 );
-                logInfo("Lendo colecao: " + colecao);
+                logInfo("Lendo coleção: " + colecao);
                 return Optional.of(colecao);
             }
         }
@@ -166,7 +127,7 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
             stmt.setLong(4, colecao.getQuantidade());
             stmt.setInt(5, id);
             stmt.executeUpdate();
-            logWarn("Carta atualizada com sucesso!");
+            logWarn("Coleção atualizada com sucesso!");
             conn.close();
 
         }catch (SQLException e){
@@ -182,7 +143,7 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
             var stmt = conn.prepareStatement("DELETE FROM " + TB_NAME + " WHERE COD_COLECAO = ?");
             stmt.setInt(1, id);
             stmt.executeUpdate();
-            logWarn("Colecao deletada com sucesso");
+            logWarn("Coleção deletada com sucesso");
             conn.close();
         }
         catch (SQLException e) {
