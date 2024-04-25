@@ -76,7 +76,14 @@ public class CardResource {
 
     @DELETE
     @Path("{id}")
-    public void delete(@PathParam("id") int id){
-
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response delete(@PathParam("id") int id){
+        try{
+            cardService.delete(id);
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
+        catch(IllegalArgumentException e){
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
     }
 }

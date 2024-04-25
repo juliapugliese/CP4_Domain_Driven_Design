@@ -28,4 +28,8 @@ public class CardService {
         else
             cardRepository.update(id, carta);
     }
+
+    public void delete(int id){
+        cardRepository.delete(id);
+    }
 }

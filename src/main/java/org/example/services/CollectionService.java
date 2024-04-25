@@ -28,4 +28,7 @@ public class CollectionService {
         else
             collectionRepository.update(id, colecao);
     }
+    public void delete(int id){
+        collectionRepository.delete(id);
+    }
 }
