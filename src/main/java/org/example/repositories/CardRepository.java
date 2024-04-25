@@ -158,7 +158,7 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
                             rs.getDouble("PRECO"),
                             collectionRepository.get(codColecao).get()
                     );
-                    logInfo("Lendo carta" + carta);
+                    logInfo("Lendo carta: " + carta);
                     return Optional.of(carta);
                 }
             }
