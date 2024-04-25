@@ -2,7 +2,6 @@ package org.example.repositories;
 
 import org.example.entities._BaseEntity;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 

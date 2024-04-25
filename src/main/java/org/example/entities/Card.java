@@ -1,6 +1,8 @@
 package org.example.entities;
 
 
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.StringJoiner;
 
 public class Card extends _BaseEntity {
@@ -118,6 +120,26 @@ public class Card extends _BaseEntity {
                     .add("preco=" + preco)
                     .toString();
         }
+    }
+
+    public Map<Boolean, ArrayList<String>> validate() {
+        var errors = new ArrayList<String>();
+        if (nome == null || nome.isBlank())
+            errors.add("Nome da carta não pode ser vazio");
+        if (tipo == null || tipo.isBlank())
+            errors.add("A carta tem que ter um tipo");
+        if (descricao == null || descricao.isBlank())
+            errors.add("A carta tem que ter descrição");
+        if (poder < 0)
+            errors.add("A carta não pode ter poder negativo");
+        if (poder < 0)
+            errors.add("A carta não pode ter resistencia negativa");
+        if (preco < 0)
+            errors.add("Preço da carta não pode ser menor que zero");
+
+        return !errors.isEmpty() ?
+                Map.of(false, errors) :
+                Map.of(true, errors);
     }
 
 }

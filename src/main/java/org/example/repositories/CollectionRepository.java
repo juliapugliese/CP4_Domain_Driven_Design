@@ -5,7 +5,6 @@ import org.example.infraestructure.OracleDbConfiguration;
 
 import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

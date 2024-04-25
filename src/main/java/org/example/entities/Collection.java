@@ -3,6 +3,7 @@ package org.example.entities;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 
 public class Collection extends _BaseEntity {
@@ -79,5 +80,18 @@ public class Collection extends _BaseEntity {
                 .add("quantidade=" + quantidade)
                 .add("cartas=" + cartas)
                 .toString();
+    }
+
+
+    public Map<Boolean, ArrayList<String>> validate() {
+        var errors = new ArrayList<String>();
+        if (nome == null || nome.isBlank())
+            errors.add("Nome da coleção não pode ser vazio");
+        if (dataLancamento == null)
+            errors.add("A coleção tem que ter uma data de lançamento");
+
+        return !errors.isEmpty() ?
+                Map.of(false, errors) :
+                Map.of(true, errors);
     }
 }
