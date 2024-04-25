@@ -61,7 +61,12 @@ public class Main {
 
         var carta31 = new Card(4,"Ronom Unicorn","Creature — Unicorn", "Sacrifice Ronom Unicorn: Destroy target enchantment.", 2,2, 0.45);
 
+        var carta4 = new Card(5,"Squall Drifter","Snow Creature — Elemental", "Flying", 1,1, 1.20);
+
         var collection = new Collection(1, "Dark", LocalDate.now(), new ArrayList<>(List.of(carta2)));
+
+        var collection11 = new Collection(3, "Black", LocalDate.now(), new ArrayList<>(List.of(carta4)));
+
 
         var collecao2 = new Collection(2,"Light", LocalDate.now(), new ArrayList<>(List.of(carta3, carta)));
 
@@ -71,16 +76,34 @@ public class Main {
         cardRepo.create(carta);
         cardRepo.create(carta2);
         cardRepo.create(carta3);
+        System.out.println("----------------------");
         cardRepo.get(3);
+        System.out.println("----------------------");
         cardRepo.update(3, carta31);
+        System.out.println("----------------------");
         cardRepo.get(3);
+        System.out.println("----------------------");
         cardRepo.get(2);
+        System.out.println("----------------------");
         cardRepo.delete(2);
+        System.out.println("----------------------");
         cardRepo.getAllByCollection(2);
-
+        System.out.println("----------------------");
         cardRepo.getAll();
 
+        System.out.println("----------------------");
         coleRepo.getAll();
+        System.out.println("----------------------");
+        coleRepo.get(1);
+        System.out.println("----------------------");
+        coleRepo.update(1, collection11);
+        System.out.println("----------------------");
+        coleRepo.get(1);
+        System.out.println("----------------------");
+        coleRepo.delete(1);
+        System.out.println("----------------------");
+        coleRepo.getAll();
+        System.out.println("----------------------");
 
 
 

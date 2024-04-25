@@ -64,7 +64,7 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
                             listaCartas
                     ));
                 }
-                logInfo("lendo colecao" + colecoes);
+                logInfo("lendo coleções" + colecoes);
             } catch (SQLException e) {
                 logError(e);
             }
