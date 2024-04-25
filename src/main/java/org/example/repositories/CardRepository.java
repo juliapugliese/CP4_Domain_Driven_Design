@@ -1,0 +1,179 @@
+package org.example.repositories;
+
+import org.example.entities.Card;
+import org.example.entities._BaseEntity;
+import org.example.infraestructure.OracleDbConfiguration;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
+public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
+    public static final String TB_NAME = "CARTAS";
+    @Override
+    public void create(Card carta) {
+        try (var conn = new OracleDbConfiguration().getConnection()){
+             String sql = carta.getColecao() != null ?
+                     "INSERT INTO " + TB_NAME + " (NOME, TIPO, DESCRICAO, PODER, RESISTENCIA, PRECO, COD_COLECAO) VALUES (?,?,?,?,?,?,?)" :
+                     "INSERT INTO " + TB_NAME + " (NOME, TIPO, DESCRICAO, PODER, RESISTENCIA, PRECO) VALUES (?,?,?,?,?,?)";
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             stmt.setString(1, carta.getNome());
+             stmt.setString(2, carta.getTipo());
+             stmt.setString(3, carta.getDescricao());
+             stmt.setInt(4, carta.getPoder());
+             stmt.setInt(5, carta.getResistencia());
+             stmt.setDouble(6, carta.getPreco());
+            if (carta.getColecao() != null) {
+                stmt.setInt(7, carta.getColecao().getId());
+            }
+            stmt.executeUpdate();
+            logInfo("Carta adicionada com sucesso");
+        } catch (SQLException e) {
+            logError(e);
+        }
+    }
+
+    @Override
+
+    public List<Card> getAll(){
+        var cartas = new ArrayList<Card>();
+        try{
+            var conn = new OracleDbConfiguration().getConnection();
+            var stmt = conn.prepareStatement("SELECT * FROM " + TB_NAME +" ORDER BY COD_CARTAS");
+            var rs = stmt.executeQuery();
+            while(rs.next()){
+                CollectionRepository collectionRepository = new CollectionRepository();
+                int codColecao = rs.getInt("COD_COLECAO");
+                if (rs.wasNull()) {
+                    cartas.add(new Card(
+                            rs.getInt("COD_CARTAS"),
+                            rs.getString("NOME"),
+                            rs.getString("TIPO"),
+                            rs.getString("DESCRICAO"),
+                            rs.getInt("PODER"),
+                            rs.getInt("RESISTENCIA"),
+                            rs.getDouble("PRECO"),
+                            null
+                    ));
+                } else {
+                    cartas.add(new Card(
+                            rs.getInt("COD_CARTAS"),
+                            rs.getString("NOME"),
+                            rs.getString("TIPO"),
+                            rs.getString("DESCRICAO"),
+                            rs.getInt("PODER"),
+                            rs.getInt("RESISTENCIA"),
+                            rs.getDouble("PRECO"),
+                            collectionRepository.get(codColecao).get()
+                    ));
+                }
+            }
+            conn.close();
+        }
+        catch (SQLException e) {
+            logError(e);
+        }
+        logInfo("Lendo cartas: " + cartas);
+        return cartas;
+    }
+
+    //teste
+    public List<Card> getAllByCollection(int idCollection){
+        var cartas = new ArrayList<Card>();
+        try{var conn = new OracleDbConfiguration().getConnection();
+            var stmt = conn.prepareStatement("SELECT * FROM " + TB_NAME + " WHERE COD_COLECAO = ?");
+            stmt.setInt(1, idCollection);
+            var rs = stmt.executeQuery();
+            while (rs.next()){
+                CollectionRepository collectionRepository = new CollectionRepository();
+                cartas.add(new Card(
+                        rs.getInt("COD_CARTAS"),
+                        rs.getString("NOME"),
+                        rs.getString("TIPO"),
+                        rs.getString("DESCRICAO"),
+                        rs.getInt("PODER"),
+                        rs.getInt("RESISTENCIA"),
+                        rs.getDouble("PRECO"),
+                        collectionRepository.get(rs.getInt("COD_COLECAO")).get()));
+            }
+            conn.close();
+        }
+        catch (SQLException e) {
+            logError(e);
+        }
+        cartas.sort(Comparator.comparingInt(_BaseEntity::getId));
+        logInfo("Lendo cartas: " + cartas);
+        return cartas;
+    }
+
+    @Override
+    public Optional<Card> get(int id){
+        try(var conn = new OracleDbConfiguration().getConnection();
+            var stmt = conn.prepareStatement("SELECT * FROM " + TB_NAME + " WHERE COD_CARTAS = ?")){
+            stmt.setInt(1, id);
+            var rs = stmt.executeQuery();
+            if(rs.next()){
+                var carta = new Card(
+                        rs.getInt("COD_CARTAS"),
+                        rs.getString("NOME"),
+                        rs.getString("TIPO"),
+                        rs.getString("DESCRICAO"),
+                        rs.getInt("PODER"),
+                        rs.getInt("RESISTENCIA"),
+                        rs.getDouble("PRECO"));
+                logInfo("Lendo carta: " + carta);
+                return Optional.of(carta);
+            }
+            conn.close();
+        }
+        catch (SQLException e) {
+            logError(e);
+        }
+
+        return Optional.empty();
+    }
+
+
+
+
+    @Override
+    public void update(int id, Card carta){
+        try(var conn = new OracleDbConfiguration().getConnection();
+            var stmt = conn.prepareStatement("UPDATE "+ TB_NAME + " SET NOME = ?, TIPO = ?, DESCRICAO = ?, PODER = ?, RESISTENCIA = ?, PRECO = ? WHERE COD_CARTAS = ?")) {
+            stmt.setString(1, carta.getNome());
+            stmt.setString(2, carta.getTipo());
+            stmt.setString(3, carta.getDescricao());
+            stmt.setInt(4, carta.getPoder());
+            stmt.setInt(5, carta.getResistencia());
+            stmt.setDouble(6, carta.getPreco());
+            stmt.setInt(7, id);
+            stmt.executeUpdate();
+
+            logWarn("Carta atualizada com sucesso!");
+            conn.close();
+        }
+        catch (SQLException e) {
+            logError(e);
+        }
+    }
+
+    @Override
+    public void delete(int id) {
+
+        try{var conn = new OracleDbConfiguration().getConnection();
+            var stmt = conn.prepareStatement("DELETE FROM " + TB_NAME + " WHERE COD_CARTAS = ?");
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            logWarn("Carta deletada com sucesso");
+            conn.close();
+        }
+        catch (SQLException e) {
+            logError(e);
+        }
+    }
+
+}
