@@ -5,6 +5,7 @@ import org.example.infraestructure.OracleDbConfiguration;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -138,17 +139,30 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
 
     @Override
     public void delete(int id) {
+        try (var conn = new OracleDbConfiguration().getConnection()) {
+            try (var updateStmt = conn.prepareStatement("UPDATE " + CardRepository.TB_NAME + " SET COD_COLECAO = NULL WHERE COD_COLECAO = ?")) {
+                updateStmt.setInt(1, id);
+                updateStmt.executeUpdate();
+                logWarn("Carta atualizada com sucesso");
+            } catch (SQLException e) {
+                logError(e);
+            }
 
-        try{var conn = new OracleDbConfiguration().getConnection();
-            var stmt = conn.prepareStatement("DELETE FROM " + TB_NAME + " WHERE COD_COLECAO = ?");
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-            logWarn("Coleção deletada com sucesso");
-            conn.close();
-        }
-        catch (SQLException e) {
+            try (var deleteStmt = conn.prepareStatement("DELETE FROM " + TB_NAME + " WHERE COD_COLECAO = ?")) {
+                deleteStmt.setInt(1, id);
+                deleteStmt.executeUpdate();
+                logWarn("Coleção deletada com sucesso");
+            } catch (SQLException e) {
+                logError(e);
+            }
+        } catch (SQLException e) {
             logError(e);
         }
     }
 
 }
+
+
+
+
+

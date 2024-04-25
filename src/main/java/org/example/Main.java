@@ -59,23 +59,25 @@ public class Main {
 
         var carta3 = new Card(3,"Boreal Griffin","Snow Creature — Griffin", "Boreal Griffin gains first strike until end of turn.", 3,2, 0.40);
 
-        var carta31 = new Card(4,"Ronom Unicorn","Creature — Unicorn", "Sacrifice Ronom Unicorn: Destroy target enchantment.", 2,2, 0.45);
+        var carta31 = new Card(3,"Ronom Unicorn","Creature — Unicorn", "Sacrifice Ronom Unicorn: Destroy target enchantment.", 2,2, 0.45);
 
-        var carta4 = new Card(5,"Squall Drifter","Snow Creature — Elemental", "Flying", 1,1, 1.20);
+        var carta4 = new Card(4,"Squall Drifter","Snow Creature — Elemental", "Flying", 1,1, 1.20);
 
-        var collection = new Collection(1, "Dark", LocalDate.now(), new ArrayList<>(List.of(carta2)));
+        var collection1 = new Collection(1, "Dark", LocalDate.now(), new ArrayList<>(List.of(carta2)));
 
-        var collection11 = new Collection(3, "Black", LocalDate.now(), new ArrayList<>(List.of(carta4)));
+        var collection11 = new Collection(1, "Black", LocalDate.now(), new ArrayList<>(List.of(carta4)));
 
 
         var collecao2 = new Collection(2,"Light", LocalDate.now(), new ArrayList<>(List.of(carta3, carta)));
 
-        coleRepo.create(collection);
+        coleRepo.create(collection1);
         coleRepo.create(collecao2);
         //colecao precisa ser criada antes da carta para que exista a chave estrangeira
+
         cardRepo.create(carta);
         cardRepo.create(carta2);
         cardRepo.create(carta3);
+        cardRepo.create(carta4);
         System.out.println("----------------------");
         cardRepo.get(3);
         System.out.println("----------------------");
@@ -100,10 +102,15 @@ public class Main {
         System.out.println("----------------------");
         coleRepo.get(1);
         System.out.println("----------------------");
-        coleRepo.delete(1);
+        cardRepo.getAll();
+        System.out.println("----------------------");
+        coleRepo.delete(2);
         System.out.println("----------------------");
         coleRepo.getAll();
         System.out.println("----------------------");
+        cardRepo.getAll();
+
+
 
 
 
