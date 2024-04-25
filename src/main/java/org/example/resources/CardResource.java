@@ -10,7 +10,7 @@ import org.example.services.CardService;
 import java.util.List;
 
 
-@Path("carta")
+@Path("cartas")
 public class CardResource {
 
     public CardRepository cardRepository;
@@ -21,16 +21,16 @@ public class CardResource {
         cardService = new CardService();
     }
 
-//    @GET
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public List<Card> getAll(
-//            @QueryParam("orderby") String orderBy,
-//            @QueryParam("direction") String direction,
-//            @QueryParam("limit") int limit,
-//            @QueryParam("offset") int offset
-//    ){
-//       return cardRepository.getAll(orderBy,direction, limit, offset);
-//    }
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Card> getAllFiltro(
+            @QueryParam("orderby") String orderBy,
+            @QueryParam("direction") String direction,
+            @QueryParam("limit") int limit,
+            @QueryParam("offset") int offset
+    ){
+       return cardRepository.getAllFiltro(orderBy,direction, limit, offset);
+    }
 
     @GET
     @Path("colecao/{id}")
@@ -43,9 +43,9 @@ public class CardResource {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response get(@PathParam("id") int id){
-        var produto = cardRepository.get(id);
-        return produto.isPresent() ?
-                Response.ok(produto.get()).build() :
+        var carta = cardRepository.get(id);
+        return carta.isPresent() ?
+                Response.ok(carta.get()).build() :
                 Response.status(Response.Status.NOT_FOUND).build();
     }
 

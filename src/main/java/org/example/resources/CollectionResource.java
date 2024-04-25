@@ -3,11 +3,14 @@ package org.example.resources;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
 import org.example.entities.Collection;
 import org.example.repositories.CollectionRepository;
 import org.example.services.CollectionService;
 
+import java.util.List;
 
+@Path("colecoes")
 public class CollectionResource {
     public CollectionRepository collectionRepository;
     public CollectionService collectionService;
@@ -18,12 +21,23 @@ public class CollectionResource {
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Collection> getAllFiltro(
+            @QueryParam("orderby") String orderBy,
+            @QueryParam("direction") String direction,
+            @QueryParam("limit") int limit,
+            @QueryParam("offset") int offset
+    ){
+        return collectionRepository.getAllFiltro(orderBy,direction, limit, offset);
+    }
+
+    @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response get(@PathParam("id") int id){
-        var produto = collectionRepository.get(id);
-        return produto.isPresent() ?
-                Response.ok(produto.get()).build() :
+        var colecao = collectionRepository.get(id);
+        return colecao.isPresent() ?
+                Response.ok(colecao.get()).build() :
                 Response.status(Response.Status.NOT_FOUND).build();
     }
 

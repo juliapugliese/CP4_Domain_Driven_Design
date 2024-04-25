@@ -46,7 +46,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
         //teste
 
-
         new Starter().initialize();
 
         var coleRepo = new CollectionRepository();
@@ -67,6 +66,7 @@ public class Main {
 
         var collection11 = new Collection(1, "Black", LocalDate.now(), new ArrayList<>(List.of(carta4)));
 
+        var collection = new Collection(3, "Innistrad: Midnight Hunt (MID)", LocalDate.now(), List.of(carta, carta));
 
         var collecao2 = new Collection(2,"Light", LocalDate.now(), new ArrayList<>(List.of(carta3, carta)));
 
@@ -113,20 +113,11 @@ public class Main {
 
 
 
-
-
-
-
-//        var collection = new Collection(1, "Innistrad: Midnight Hunt (MID)", LocalDate.now(), List.of(carta, carta));
-//        System.out.println(collection);
-
-
-
-//        final HttpServer server = startServer();
-//        System.out.println(String.format("Jersey app started with endpoints available at "
-//                + "%s%nHit Ctrl-C to stop it...", BASE_URI));
-//        System.in.read();
-//        server.stop();
+        final HttpServer server = startServer();
+        System.out.println(String.format("Jersey app started with endpoints available at "
+                + "%s%nHit Ctrl-C to stop it...", BASE_URI));
+        System.in.read();
+        server.stop();
 
     }
 }
