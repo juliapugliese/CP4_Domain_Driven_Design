@@ -7,6 +7,7 @@ import org.example.infraestructure.OracleDbConfiguration;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -81,7 +82,6 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
         return cartas;
     }
 
-    //teste
     public List<Card> getAllByCollection(int idCollection){
         var cartas = new ArrayList<Card>();
         try{var conn = new OracleDbConfiguration().getConnection();
@@ -145,6 +145,7 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
                             rs.getDouble("PRECO"),
                             null
                     );
+                    logInfo("Lendo carta" + carta);
                     return Optional.of(carta);
                 } else {
                     var carta = new Card(
@@ -157,6 +158,7 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
                             rs.getDouble("PRECO"),
                             collectionRepository.get(codColecao).get()
                     );
+                    logInfo("Lendo carta" + carta);
                     return Optional.of(carta);
                 }
             }
@@ -169,15 +171,12 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
         return Optional.empty();
     }
 
-
-
-
     @Override
     public void update(int id, Card carta){
         try(var conn = new OracleDbConfiguration().getConnection()) {
             String sql = carta.getColecao() != null ?
-                    "UPDATE " + TB_NAME + " SET NOME = ?, TIPO = ?, DESCRICAO = ?, PODER = ?, RESISTENCIA = ?, PRECO = ? WHERE COD_CARTAS = ?" :
-                    "UPDATE " + TB_NAME + " SET NOME = ?, TIPO = ?, DESCRICAO = ?, PODER = ?, RESISTENCIA = ?, PRECO = ?, COD_COLECAO = ? WHERE COD_CARTAS = ?";
+                    "UPDATE " + TB_NAME + " SET NOME = ?, TIPO = ?, DESCRICAO = ?, PODER = ?, RESISTENCIA = ?, PRECO = ?, COD_COLECAO = ? WHERE COD_CARTAS = ?" :
+                    "UPDATE " + TB_NAME + " SET NOME = ?, TIPO = ?, DESCRICAO = ?, PODER = ?, RESISTENCIA = ?, PRECO = ? WHERE COD_CARTAS = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, carta.getNome());
             stmt.setString(2, carta.getTipo());
@@ -188,6 +187,7 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
             if (carta.getColecao() != null) {
                 stmt.setInt(7, carta.getColecao().getId());
             }
+            stmt.setInt(carta.getColecao() != null ? 8 : 7, id);
             stmt.executeUpdate();
             logInfo("Carta atualizada com sucesso");
         }
