@@ -4,6 +4,7 @@ import org.example.entities.Collection;
 import org.example.infraestructure.OracleDbConfiguration;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,14 +17,15 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
     @Override
     public void create(Collection colecao) {
         try(var conn = new OracleDbConfiguration().getConnection();
-            var stmt = conn.prepareStatement("INSERT INTO " + TB_NAME + " (NOME, DATA_LANCAMENTO, PRECO, QUANTIDADE) VALUES (?,?,?,?)")){
+            var stmt = conn.prepareStatement("INSERT INTO " + CollectionRepository.TB_NAME + " (NOME, DATA_LANCAMENTO, PRECO, QUANTIDADE) VALUES (?,?,?,?)")){
             stmt.setString(1, colecao.getNome());
             stmt.setDate(2, Date.valueOf(colecao.getDataLancamento()));
             stmt.setDouble(3, colecao.getPreco());
             stmt.setLong(4, colecao.getQuantidade());
             stmt.executeUpdate();
 
-            logInfo("Colecao adicionada com sucesso");
+            if(colecao.getCartas() != null){adicionarCartas(colecao.getId());}
+            logInfo("Coleção adicionada com sucesso");
             conn.close();
         }
         catch (SQLException e) {
@@ -31,7 +33,31 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
         }
     }
 
-    //CRIAR MÉTODO ADICIONAR CARTA A COLEÇÃO
+    public void adicionarCartas(int id){
+        try (var conn = new OracleDbConfiguration().getConnection();
+             var stmtCartas = conn.prepareStatement("SELECT * FROM " + CardRepository.TB_NAME + " WHERE COD_COLECAO = ? ORDER BY COD_CARTAS")) {
+            stmtCartas.setInt(1, id);
+            var rsCartas = stmtCartas.executeQuery();
+            while (rsCartas.next()) {
+                try{var stmt = conn.prepareStatement("UPDATE " + CardRepository.TB_NAME + " SET COD_COLECAO = ? WHERE COD_CARTAS = ?");
+                    stmt.setInt(1, id);
+                    stmt.setInt(2, rsCartas.getInt("COD_CARTAS"));
+                    stmt.executeUpdate();
+                    logWarn("Carta adicionada com sucesso");
+                    conn.close();
+                }
+                catch (SQLException e) {
+                    logError(e);
+                }
+            }
+        } catch (SQLException e) {
+            logError(e);
+        }
+    }
+
+
+
+
 
     @Override
     public List<Collection> getAll() {
