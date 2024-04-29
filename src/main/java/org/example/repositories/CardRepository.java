@@ -7,12 +7,29 @@ import org.example.infraestructure.OracleDbConfiguration;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.sql.ResultSet;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
     public static final String TB_NAME = "CARTAS";
+
+    public boolean exists(int cardId) {
+        try(var conn = new OracleDbConfiguration().getConnection();
+            var stmt = conn.prepareStatement("SELECT COUNT(*) FROM " + CardRepository.TB_NAME + " WHERE COD_CARTAS = ?")){
+            stmt.setInt(1, cardId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+        catch (SQLException e) {
+            logError(e);
+        }
+        return false;
+    }
+
     @Override
     public void create(Card carta) {
         try (var conn = new OracleDbConfiguration().getConnection()){
@@ -31,6 +48,7 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
             }
             stmt.executeUpdate();
             logInfo("Carta adicionada com sucesso");
+            conn.close();
         } catch (SQLException e) {
             logError(e);
         }

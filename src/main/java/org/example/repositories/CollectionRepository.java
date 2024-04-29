@@ -5,6 +5,7 @@ import org.example.infraestructure.OracleDbConfiguration;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +13,35 @@ import java.util.Optional;
 
 
 public class CollectionRepository implements _BaseRepository<Collection>, _Logger<String> {
-
     public static final String TB_NAME = "COLECAO";
     @Override
+//    public void create(Collection colecao) {
+//        try(var conn = new OracleDbConfiguration().getConnection();
+//            var stmt = conn.prepareStatement("INSERT INTO " + CollectionRepository.TB_NAME + " (NOME, DATA_LANCAMENTO, PRECO, QUANTIDADE) VALUES (?,?,?,?)")){
+//            stmt.setString(1, colecao.getNome());
+//            stmt.setDate(2, Date.valueOf(colecao.getDataLancamento()));
+//            stmt.setDouble(3, colecao.getPreco());
+//            stmt.setLong(4, colecao.getQuantidade());
+//            stmt.executeUpdate();
+//            logInfo("Coleção adicionada com sucesso");
+//            conn.close();
+//        }
+//        catch (SQLException e) {
+//            logError(e);
+//        }
+//
+//        var cardRepository = new CardRepository();
+//
+//        colecao.getCartas().forEach(cartinha -> {
+//            if (cardRepository.exists(cartinha.getId())) {
+//                adicionarColecaoNaCarta(colecao.getId());
+//            }
+//            else{
+//                cardRepository.create(cartinha);
+//            }
+//        });
+//
+//    }
     public void create(Collection colecao) {
         try(var conn = new OracleDbConfiguration().getConnection();
             var stmt = conn.prepareStatement("INSERT INTO " + CollectionRepository.TB_NAME + " (NOME, DATA_LANCAMENTO, PRECO, QUANTIDADE) VALUES (?,?,?,?)")){
@@ -23,8 +50,12 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
             stmt.setDouble(3, colecao.getPreco());
             stmt.setLong(4, colecao.getQuantidade());
             stmt.executeUpdate();
+            var cardRepository = new CardRepository();
+            if(colecao.getCartas() != null){
+                adicionarColecaoNaCarta(colecao.getId());
+            }
 
-            if(colecao.getCartas() != null){adicionarCartas(colecao.getId());}
+
             logInfo("Coleção adicionada com sucesso");
             conn.close();
         }
@@ -33,23 +64,23 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
         }
     }
 
-    public void adicionarCartas(int id){
+    public void adicionarColecaoNaCarta(int idColecao){
         try (var conn = new OracleDbConfiguration().getConnection();
              var stmtCartas = conn.prepareStatement("SELECT * FROM " + CardRepository.TB_NAME + " WHERE COD_COLECAO = ? ORDER BY COD_CARTAS")) {
-            stmtCartas.setInt(1, id);
+            stmtCartas.setInt(1, idColecao);
             var rsCartas = stmtCartas.executeQuery();
             while (rsCartas.next()) {
                 try{var stmt = conn.prepareStatement("UPDATE " + CardRepository.TB_NAME + " SET COD_COLECAO = ? WHERE COD_CARTAS = ?");
-                    stmt.setInt(1, id);
+                    stmt.setInt(1, idColecao);
                     stmt.setInt(2, rsCartas.getInt("COD_CARTAS"));
                     stmt.executeUpdate();
                     logWarn("Carta adicionada com sucesso");
-                    conn.close();
                 }
                 catch (SQLException e) {
                     logError(e);
                 }
             }
+            conn.close();
         } catch (SQLException e) {
             logError(e);
         }

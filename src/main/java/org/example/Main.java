@@ -70,8 +70,12 @@ public class Main {
 
         var collecao2 = new Collection(2,"Light", LocalDate.now(), new ArrayList<>(List.of(carta3, carta)));
 
-        coleRepo.create(collection1);
+//        coleRepo.create(collection1);
+//        cardRepo.getAll();
+        System.out.println("----------------------");
         coleRepo.create(collecao2);
+        cardRepo.getAll();
+        System.out.println("----------------------");
         //colecao precisa ser criada antes da carta para que exista a chave estrangeira
 
         cardRepo.create(carta);
