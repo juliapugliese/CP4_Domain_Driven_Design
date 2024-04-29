@@ -70,49 +70,51 @@ public class Main {
 
         var collecao2 = new Collection(2,"Light", LocalDate.now(), new ArrayList<>(List.of(carta3, carta)));
 
-//        coleRepo.create(collection1);
-//        cardRepo.getAll();
+        coleRepo.create(collection1);
+        cardRepo.getAll();
         System.out.println("----------------------");
         coleRepo.create(collecao2);
+        System.out.println(collecao2);
         cardRepo.getAll();
+        coleRepo.getAll();
         System.out.println("----------------------");
         //colecao precisa ser criada antes da carta para que exista a chave estrangeira
 
-        cardRepo.create(carta);
-        cardRepo.create(carta2);
-        cardRepo.create(carta3);
-        cardRepo.create(carta4);
-        System.out.println("----------------------");
-        cardRepo.get(3);
-        System.out.println("----------------------");
-        cardRepo.update(3, carta31);
-        System.out.println("----------------------");
-        cardRepo.get(3);
-        System.out.println("----------------------");
-        cardRepo.get(2);
-        System.out.println("----------------------");
-        cardRepo.delete(2);
-        System.out.println("----------------------");
-        cardRepo.getAllByCollection(2);
-        System.out.println("----------------------");
-        cardRepo.getAll();
+//        cardRepo.create(carta);
+//        cardRepo.create(carta2);
+//        cardRepo.create(carta3);
+//        cardRepo.create(carta4);
+//        System.out.println("----------------------");
+//        cardRepo.get(3);
+//        System.out.println("----------------------");
+//        cardRepo.update(3, carta31);
+//        System.out.println("----------------------");
+//        cardRepo.get(3);
+//        System.out.println("----------------------");
+//        cardRepo.get(2);
+//        System.out.println("----------------------");
+//        cardRepo.delete(2);
+//        System.out.println("----------------------");
+//        cardRepo.getAllByCollection(2);
+//        System.out.println("----------------------");
+//        cardRepo.getAll();
 
         System.out.println("----------------------");
         coleRepo.getAll();
         System.out.println("----------------------");
         coleRepo.get(1);
         System.out.println("----------------------");
-        coleRepo.update(1, collection11);
-        System.out.println("----------------------");
+//        coleRepo.update(1, collection11);
+//        System.out.println("----------------------");
         coleRepo.get(1);
         System.out.println("----------------------");
         cardRepo.getAll();
         System.out.println("----------------------");
-        coleRepo.delete(2);
-        System.out.println("----------------------");
-        coleRepo.getAll();
-        System.out.println("----------------------");
-        cardRepo.getAll();
+//        coleRepo.delete(2);
+//        System.out.println("----------------------");
+//        coleRepo.getAll();
+//        System.out.println("----------------------");
+//        cardRepo.getAll();
 
 
 
