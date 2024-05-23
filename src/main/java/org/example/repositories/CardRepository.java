@@ -16,8 +16,22 @@ import java.util.Optional;
 public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
     public static final String TB_NAME = "CARTAS";
 
+    public boolean exists(String cardName) {
+        try(var conn = new OracleDbConfiguration().getConnection();
+            var stmt = conn.prepareStatement("SELECT COUNT(*) FROM " + CardRepository.TB_NAME + " WHERE NOME = ?")){
+            stmt.setString(1, cardName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+        catch (SQLException e) {
+            logError(e);
+        }
+        return false;
+    }
 
-
+//
     public List<Integer> getIdColecao(Collection colecao){
         var idColecao = new ArrayList<Integer>();
         try (var conn = new OracleDbConfiguration().getConnection();
@@ -34,20 +48,6 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
         }
 
         return idColecao;
-    }
-    public boolean exists(String cardName) {
-        try(var conn = new OracleDbConfiguration().getConnection();
-            var stmt = conn.prepareStatement("SELECT COUNT(*) FROM " + CardRepository.TB_NAME + " WHERE NOME = ?")){
-            stmt.setString(1, cardName);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        }
-        catch (SQLException e) {
-            logError(e);
-        }
-        return false;
     }
 
     @Override
@@ -75,7 +75,6 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
     }
 
     @Override
-
     public List<Card> getAll(){
         var cartas = new ArrayList<Card>();
         try{
@@ -263,7 +262,7 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
             stmt.setInt(5, carta.getResistencia());
             stmt.setDouble(6, carta.getPreco());
             if (carta.getColecao() != null) {
-                stmt.setInt(7, carta.getColecao().getId());
+                stmt.setInt(7, getIdColecao(carta.getColecao()).get(0));
             }
             stmt.setInt(carta.getColecao() != null ? 8 : 7, id);
             stmt.executeUpdate();

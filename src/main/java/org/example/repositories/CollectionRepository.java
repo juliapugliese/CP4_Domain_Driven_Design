@@ -14,30 +14,6 @@ import java.util.Optional;
 //gerar id automaticamente e no update setar o id
 public class CollectionRepository implements _BaseRepository<Collection>, _Logger<String> {
     public static final String TB_NAME = "COLECAO";
-    @Override
-    public void create(Collection colecao) {
-        try(var conn = new OracleDbConfiguration().getConnection();
-            var stmt = conn.prepareStatement("INSERT INTO " + CollectionRepository.TB_NAME + " (NOME, DATA_LANCAMENTO, PRECO, QUANTIDADE) VALUES (?,?,?,?)")){
-            stmt.setString(1, colecao.getNome());
-            stmt.setDate(2, Date.valueOf(colecao.getDataLancamento()));
-            stmt.setDouble(3, colecao.getPreco());
-            stmt.setLong(4, colecao.getQuantidade());
-            stmt.executeUpdate();
-
-        var cardRepository = new CardRepository();
-
-        colecao.getCartas().forEach(cartinha -> cardRepository.create(cartinha));
-
-//        colecao.getCartas().stream().filter(card -> !cardRepository.exists(card.getNome()))
-//                .forEach(card -> cardRepository.create(card));
-
-            logInfo("Coleção adicionada com sucesso");
-            conn.close();
-        }
-        catch (SQLException e) {
-            logError(e);
-        }
-    }
 
     public void atualizarColecao(int idColecao){
         try (var conn = new OracleDbConfiguration().getConnection();
@@ -83,8 +59,42 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
         }
     }
 
+//
+    @Override
+    public void create(Collection colecao) {
+        try(var conn = new OracleDbConfiguration().getConnection();
+            var stmt = conn.prepareStatement("INSERT INTO " + CollectionRepository.TB_NAME + " (NOME, DATA_LANCAMENTO, PRECO, QUANTIDADE) VALUES (?,?,?,?)")){
+            stmt.setString(1, colecao.getNome());
+            stmt.setDate(2, Date.valueOf(colecao.getDataLancamento()));
+            stmt.setDouble(3, colecao.getPreco());
+            stmt.setLong(4, colecao.getQuantidade());
+            stmt.executeUpdate();
+
+        colecao.getCartas().forEach(carta -> {
+            try (var stmtCarta = conn.prepareStatement("INSERT INTO " + CardRepository.TB_NAME + " (NOME, TIPO, DESCRICAO, PODER, RESISTENCIA, PRECO, COD_COLECAO) VALUES (?,?,?,?,?,?,?)")){
+                stmtCarta.setString(1, carta.getNome());
+                stmtCarta.setString(2, carta.getTipo());
+                stmtCarta.setString(3, carta.getDescricao());
+                stmtCarta.setInt(4, carta.getPoder());
+                stmtCarta.setInt(5, carta.getResistencia());
+                stmtCarta.setDouble(6, carta.getPreco());
+                stmtCarta.setInt(7, new CardRepository().getIdColecao(colecao).get(0));
+                stmtCarta.executeUpdate();
+                logInfo("Carta atualizada com sucesso");
+            }catch (SQLException e) {
+                logError(e);
+            }
 
 
+        });
+
+            logInfo("Coleção adicionada com sucesso");
+            conn.close();
+        }
+        catch (SQLException e) {
+            logError(e);
+        }
+    }
 
     @Override
     public List<Collection> getAll() {
@@ -215,9 +225,9 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
 
     @Override
     public void update(int id, Collection colecao) {
-        try(var conn = new OracleDbConfiguration().getConnection();
+        try(var conn = new OracleDbConfiguration().getConnection()){
             var stmt = conn.prepareStatement("UPDATE "+ TB_NAME +
-                    " SET NOME = ?, DATA_LANCAMENTO = ?, PRECO = ?, QUANTIDADE = ? WHERE COD_COLECAO = ?")){
+                    " SET NOME = ?, DATA_LANCAMENTO = ?, PRECO = ?, QUANTIDADE = ? WHERE COD_COLECAO = ?");
             stmt.setString(1, colecao.getNome());
             stmt.setDate(2, Date.valueOf(colecao.getDataLancamento()));
             stmt.setDouble(3, colecao.getPreco());
@@ -225,24 +235,40 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
             stmt.setInt(5, id);
             stmt.executeUpdate();
             logWarn("Coleção atualizada com sucesso!");
-            conn.close();
 
+
+            colecao.getCartas().forEach(carta -> {
+                try (var stmtCarta = conn.prepareStatement("UPDATE " + CardRepository.TB_NAME + " SET NOME = ?, TIPO = ?, DESCRICAO = ?, PODER = ?, RESISTENCIA = ?, PRECO = ? WHERE COD_COLECAO = ?")){
+                stmtCarta.setString(1, carta.getNome());
+                stmtCarta.setString(2, carta.getTipo());
+                stmtCarta.setString(3, carta.getDescricao());
+                stmtCarta.setInt(4, carta.getPoder());
+                stmtCarta.setInt(5, carta.getResistencia());
+                stmtCarta.setDouble(6, carta.getPreco());
+                stmtCarta.setInt(7, id);
+                stmtCarta.executeUpdate();
+                logInfo("Carta atualizada com sucesso");
+            }catch (SQLException e) {
+                logError(e);
+            }
+
+            });
+            conn.close();
         }catch (SQLException e){
             logError(e);
         }
     }
 
-
     @Override
     public void delete(int id) {
         try (var conn = new OracleDbConfiguration().getConnection()) {
-            try (var updateStmt = conn.prepareStatement("UPDATE " + CardRepository.TB_NAME + " SET COD_COLECAO = NULL WHERE COD_COLECAO = ?")) {
-                updateStmt.setInt(1, id);
-                updateStmt.executeUpdate();
-                logWarn("Carta atualizada com sucesso");
-            } catch (SQLException e) {
-                logError(e);
-            }
+//            try (var updateStmt = conn.prepareStatement("UPDATE " + CardRepository.TB_NAME + " SET COD_COLECAO = NULL WHERE COD_COLECAO = ?")) {
+//                updateStmt.setInt(1, id);
+//                updateStmt.executeUpdate();
+//                logWarn("Carta atualizada com sucesso");
+//            } catch (SQLException e) {
+//                logError(e);
+//            }
 
             try (var deleteStmt = conn.prepareStatement("DELETE FROM " + TB_NAME + " WHERE COD_COLECAO = ?")) {
                 deleteStmt.setInt(1, id);
@@ -255,7 +281,6 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
             logError(e);
         }
     }
-
 }
 
 
