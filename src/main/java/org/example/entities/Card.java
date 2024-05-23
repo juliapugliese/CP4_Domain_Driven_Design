@@ -38,6 +38,25 @@ public class Card extends _BaseEntity {
         this.preco = preco;
     }
 
+    public Card(String nome, String tipo, String descricao, int poder, int resistencia, double preco, Collection colecao) {
+        this.nome = nome;
+        this.tipo = tipo;
+        this.descricao = descricao;
+        this.poder = poder;
+        this.resistencia = resistencia;
+        this.preco = preco;
+        this.colecao = colecao;
+    }
+
+    public Card(String nome, String tipo, String descricao, int poder, int resistencia, double preco) {
+        this.nome = nome;
+        this.tipo = tipo;
+        this.descricao = descricao;
+        this.poder = poder;
+        this.resistencia = resistencia;
+        this.preco = preco;
+    }
+
     public String getNome() {
         return nome;
     }

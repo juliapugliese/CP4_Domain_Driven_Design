@@ -12,13 +12,13 @@ public class Starter implements _Logger<String>{
         try (var conn = new OracleDbConfiguration().getConnection()) {
 
 
-            try (var stmt = conn.prepareStatement("BEGIN EXECUTE IMMEDIATE 'DROP TABLE " + CardRepository.TB_NAME + "'; EXCEPTION WHEN OTHERS THEN NULL; END;")) {
+            try (var stmt = conn.prepareStatement("BEGIN EXECUTE IMMEDIATE 'DROP TABLE " + CardRepository.TB_NAME + " CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN NULL; END;")) {
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logError(e);
             }
 
-            try (var stmt = conn.prepareStatement("BEGIN EXECUTE IMMEDIATE 'DROP TABLE " + CollectionRepository.TB_NAME + "'; EXCEPTION WHEN OTHERS THEN NULL; END;")) {
+            try (var stmt = conn.prepareStatement("BEGIN EXECUTE IMMEDIATE 'DROP TABLE " + CollectionRepository.TB_NAME + " CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN NULL; END;")) {
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logError(e);
@@ -52,7 +52,7 @@ public class Starter implements _Logger<String>{
                 logError(e);
             }
 
-            try (var stmt = conn.prepareStatement("ALTER TABLE "+CardRepository.TB_NAME+" ADD CONSTRAINT CARD_COLLECTION_FK FOREIGN KEY(COD_COLECAO) REFERENCES "+CollectionRepository.TB_NAME+"(COD_COLECAO)")) {
+            try (var stmt = conn.prepareStatement("ALTER TABLE "+CardRepository.TB_NAME+" ADD CONSTRAINT CARD_COLLECTION_FK FOREIGN KEY(COD_COLECAO) REFERENCES "+CollectionRepository.TB_NAME+"(COD_COLECAO) ON DELETE SET NULL")) {
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 logError(e);

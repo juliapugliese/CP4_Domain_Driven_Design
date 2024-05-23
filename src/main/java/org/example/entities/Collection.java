@@ -29,6 +29,16 @@ public class Collection extends _BaseEntity {
         cartas.forEach(card -> card.setColecao(this));
     }
 
+    public Collection(String nome, LocalDate dataLancamento, List<Card> cartas) {
+        this.nome = nome;
+        this.dataLancamento = dataLancamento;
+        this.quantidade = cartas.size();
+        this.cartas = cartas;
+        cartas.forEach(card -> contador += card.getPreco());
+        this.preco = contador;
+        cartas.forEach(card -> card.setColecao(this));
+    }
+
     public String getNome() {
         return nome;
     }

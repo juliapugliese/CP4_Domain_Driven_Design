@@ -1,6 +1,7 @@
 package org.example.repositories;
 
 import org.example.entities.Card;
+import org.example.entities.Collection;
 import org.example.entities._BaseEntity;
 import org.example.infraestructure.OracleDbConfiguration;
 
@@ -15,6 +16,25 @@ import java.util.Optional;
 public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
     public static final String TB_NAME = "CARTAS";
 
+
+
+    public List<Integer> getIdColecao(Collection colecao){
+        var idColecao = new ArrayList<Integer>();
+        try (var conn = new OracleDbConfiguration().getConnection();
+             var stmt = conn.prepareStatement(
+                     "SELECT * FROM %s WHERE %s = '%s'"
+                             .formatted(CollectionRepository.TB_NAME, "NOME", colecao.getNome()))){
+            var resultSet = stmt.executeQuery();
+            while (resultSet.next()) {
+                idColecao.add(resultSet.getInt(("COD_COLECAO")));
+            }
+            conn.close();
+        }catch (SQLException e) {
+            logError(e);
+        }
+
+        return idColecao;
+    }
     public boolean exists(String cardName) {
         try(var conn = new OracleDbConfiguration().getConnection();
             var stmt = conn.prepareStatement("SELECT COUNT(*) FROM " + CardRepository.TB_NAME + " WHERE NOME = ?")){
@@ -44,7 +64,7 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
              stmt.setInt(5, carta.getResistencia());
              stmt.setDouble(6, carta.getPreco());
             if (carta.getColecao() != null) {
-                stmt.setInt(7, carta.getColecao().getId());
+                stmt.setInt(7, getIdColecao(carta.getColecao()).get(0));
             }
             stmt.executeUpdate();
             logInfo("Carta adicionada com sucesso");

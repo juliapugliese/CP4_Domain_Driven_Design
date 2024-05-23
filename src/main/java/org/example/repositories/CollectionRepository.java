@@ -26,13 +26,7 @@ public class CollectionRepository implements _BaseRepository<Collection>, _Logge
 
         var cardRepository = new CardRepository();
 
-        colecao.getCartas().forEach(cartinha -> {
-                    if (cardRepository.exists(cartinha.getNome())) {
-                        adicionarColecaoNaCarta(cartinha, colecao);
-                    } else {
-                        cardRepository.create(cartinha);
-                    }
-                });
+        colecao.getCartas().forEach(cartinha -> cardRepository.create(cartinha));
 
 //        colecao.getCartas().stream().filter(card -> !cardRepository.exists(card.getNome()))
 //                .forEach(card -> cardRepository.create(card));
