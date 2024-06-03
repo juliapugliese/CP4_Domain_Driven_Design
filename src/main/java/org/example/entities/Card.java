@@ -151,7 +151,7 @@ public class Card extends _BaseEntity {
             errors.add("A carta tem que ter descrição");
         if (poder < 0)
             errors.add("A carta não pode ter poder negativo");
-        if (poder < 0)
+        if (resistencia < 0)
             errors.add("A carta não pode ter resistencia negativa");
         if (preco < 0)
             errors.add("Preço da carta não pode ser menor que zero");
