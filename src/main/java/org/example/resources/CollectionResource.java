@@ -22,13 +22,13 @@ public class CollectionResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Collection> getAllFiltro(
+    public List<Collection> getAll(
             @QueryParam("orderby") String orderBy,
             @QueryParam("direction") String direction,
             @QueryParam("limit") int limit,
             @QueryParam("offset") int offset
     ){
-        return collectionRepository.getAllFiltro(orderBy,direction, limit, offset);
+        return collectionRepository.getAll(orderBy, direction, limit, offset);
     }
 
     @GET

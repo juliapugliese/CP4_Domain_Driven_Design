@@ -19,8 +19,4 @@ public class OracleDbConfiguration {
         return null;
     }
 
-    public void closeConnection(Connection connection) throws SQLException{
-        connection.close();
-    }
-
 }

@@ -16,22 +16,7 @@ import java.util.Optional;
 public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
     public static final String TB_NAME = "CARTAS";
 
-    public boolean exists(String cardName) {
-        try(var conn = new OracleDbConfiguration().getConnection();
-            var stmt = conn.prepareStatement("SELECT COUNT(*) FROM " + CardRepository.TB_NAME + " WHERE NOME = ?")){
-            stmt.setString(1, cardName);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        }
-        catch (SQLException e) {
-            logError(e);
-        }
-        return false;
-    }
 
-//
     public List<Integer> getIdColecao(Collection colecao){
         var idColecao = new ArrayList<Integer>();
         try (var conn = new OracleDbConfiguration().getConnection();
@@ -74,50 +59,7 @@ public class CardRepository implements _BaseRepository<Card>, _Logger<String>{
         }
     }
 
-    @Override
-    public List<Card> getAll(){
-        var cartas = new ArrayList<Card>();
-        try{
-            var conn = new OracleDbConfiguration().getConnection();
-            var stmt = conn.prepareStatement("SELECT * FROM " + CardRepository.TB_NAME +" ORDER BY COD_CARTAS");
-            var rs = stmt.executeQuery();
-            while(rs.next()){
-                CollectionRepository collectionRepository = new CollectionRepository();
-                int codColecao = rs.getInt("COD_COLECAO");
-                if (rs.wasNull()) {
-                    cartas.add(new Card(
-                            rs.getInt("COD_CARTAS"),
-                            rs.getString("NOME"),
-                            rs.getString("TIPO"),
-                            rs.getString("DESCRICAO"),
-                            rs.getInt("PODER"),
-                            rs.getInt("RESISTENCIA"),
-                            rs.getDouble("PRECO"),
-                            null
-                    ));
-                } else {
-                    cartas.add(new Card(
-                            rs.getInt("COD_CARTAS"),
-                            rs.getString("NOME"),
-                            rs.getString("TIPO"),
-                            rs.getString("DESCRICAO"),
-                            rs.getInt("PODER"),
-                            rs.getInt("RESISTENCIA"),
-                            rs.getDouble("PRECO"),
-                            collectionRepository.get(codColecao).get()
-                    ));
-                }
-            }
-            conn.close();
-        }
-        catch (SQLException e) {
-            logError(e);
-        }
-        logInfo("Lendo cartas: " + cartas);
-        return cartas;
-    }
-
-    public List<Card> getAllFiltro(String orderBy, String direction, int limit, int offset) {
+    public List<Card> getAll(String orderBy, String direction, int limit, int offset) {
         var cartas = new ArrayList<Card>();
         try(var conn = new OracleDbConfiguration().getConnection();
             var stmt = conn.prepareStatement(

@@ -75,12 +75,12 @@ public class Main {
 
 
         coleRepo.create(collection1);
-        cardRepo.getAll();
+//        cardRepo.getAll();
         System.out.println("----------------------");
         coleRepo.create(collecao2);
         System.out.println(collecao2);
-        cardRepo.getAll();
-        coleRepo.getAll();
+//        cardRepo.getAll();
+//        coleRepo.getAll();
         System.out.println("----------------------");
         //colecao precisa ser criada antes da carta para que exista a chave estrangeira
 
@@ -104,7 +104,7 @@ public class Main {
 //        cardRepo.getAll();
 
         System.out.println("----------------------");
-        coleRepo.getAll();
+//        coleRepo.getAll();
         System.out.println("----------------------");
         coleRepo.get(1);
         System.out.println("----------------------");
@@ -112,7 +112,7 @@ public class Main {
 //        System.out.println("----------------------");
         coleRepo.get(1);
         System.out.println("----------------------");
-        cardRepo.getAll();
+//        cardRepo.getAll();
         System.out.println("----------------------");
 //        coleRepo.delete(2);
 //        System.out.println("----------------------");

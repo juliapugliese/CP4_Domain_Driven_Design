@@ -23,13 +23,13 @@ public class CardResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Card> getAllFiltro(
+    public List<Card> getAll(
             @QueryParam("orderby") String orderBy,
             @QueryParam("direction") String direction,
             @QueryParam("limit") int limit,
             @QueryParam("offset") int offset
     ){
-       return cardRepository.getAllFiltro(orderBy,direction, limit, offset);
+       return cardRepository.getAll(orderBy, direction, limit, offset);
     }
 
     @GET
